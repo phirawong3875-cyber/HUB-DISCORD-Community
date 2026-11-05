@@ -1,1 +1,27 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายละเอียดเซิร์ฟเวอร์</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">DISCORD <span>HUB</span></a>
+    <a class="back-link" href="index.html">← กลับหน้าหลัก</a>
+  </header>
 
+  <main class="container detail-container">
+    <div id="server-detail">
+      <p class="loading">กำลังโหลดข้อมูล...</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 Thai Discord Directory</p>
+  </footer>
+
+  <script src="js/detail.js"></script>
+</body>
+</html>
