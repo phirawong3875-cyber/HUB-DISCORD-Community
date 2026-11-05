@@ -1,56 +1,62 @@
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ศูนย์รวมดิสคนไทย (ดิสใหม่)</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="topbar">
-  <a class="brand" href="index.html">NEON <span>TH</span></a>
-  <a class="admin-link" href="admin.html">Admin</a>
-</header>
 
-<main class="container">
-  <section class="hero">
-    <p class="eyebrow">THAILAND DISCORD DIRECTORY</p>
-    <h1>ศูนย์รวมดิสคนไทย <span>(ดิสใหม่)</span></h1>
-    <p>ค้นหาและพบกับชุมชน Discord ที่คุณสนใจ</p>
+  <header class="topbar">
+    <a class="brand" href="index.html">DISCORD HUB</a>
+    <span class="top-label">THAI COMMUNITY</span>
+  </header>
 
-    <input id="search" placeholder="ค้นหาชื่อเซิร์ฟเวอร์...">
+  <main class="container">
+    <section class="hero">
+      <p class="eyebrow">WELCOME TO THE COMMUNITY</p>
+      <h1>ศูนย์รวมดิสคนไทย <span>(ดิสใหม่)</span></h1>
+      <p class="hero-desc">
+        ค้นหา Discord Community ที่คุณสนใจ
+        แล้วเข้ามาทำความรู้จักเพื่อนใหม่กัน!
+      </p>
+    </section>
 
-    <select id="category">
-      <option value="">ทุกหมวดหมู่</option>
-      <option>Anime</option>
-      <option>Gaming</option>
-      <option>Community</option>
-      <option>Education</option>
-      <option>Other</option>
-    </select>
-  </section>
+    <section class="toolbar">
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="ค้นหาชื่อดิส หรือคำอธิบาย..."
+      >
 
-  <section class="server-section">
-    <div class="section-title">
-      <h2>เลือกเซิร์ฟเวอร์</h2>
-      <span id="count">กำลังโหลด...</span>
-    </div>
+      <select id="categoryFilter">
+        <option value="">ทุกหมวดหมู่</option>
+      </select>
 
-    <div id="serverList" class="server-list"></div>
+      <select id="sortSelect">
+        <option value="newest">เพิ่มล่าสุด</option>
+        <option value="oldest">เพิ่มเก่าสุด</option>
+        <option value="name">เรียงตามชื่อ</option>
+      </select>
+    </section>
 
-    <div class="pagination">
-      <button id="previous">ก่อนหน้า</button>
-      <span id="pageInfo">หน้า 1</span>
-      <button id="next">ถัดไป</button>
-    </div>
-  </section>
-</main>
+    <section class="list-heading">
+      <h2>เซิร์ฟเวอร์ทั้งหมด</h2>
+      <span id="serverCount">กำลังโหลด...</span>
+    </section>
 
-<footer>NEON THAILAND COMMUNITY</footer>
+    <section id="serverList" class="server-list">
+      <p class="loading">กำลังโหลดข้อมูล...</p>
+    </section>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js"></script>
-<script src="js/main.js"></script>
+    <nav id="pagination" class="pagination"></nav>
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 Thai Discord Community Directory</p>
+  </footer>
+
+  <script src="js/main.js"></script>
 </body>
 </html>
