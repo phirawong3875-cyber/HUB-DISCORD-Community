@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ศูนย์รวมดิสคนไทย (ดิสใหม่)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html">NEON <span>TH</span></a>
+  <a class="admin-link" href="admin.html">Admin</a>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <p class="eyebrow">THAILAND DISCORD DIRECTORY</p>
+    <h1>ศูนย์รวมดิสคนไทย <span>(ดิสใหม่)</span></h1>
+    <p>ค้นหาและพบกับชุมชน Discord ที่คุณสนใจ</p>
+
+    <input id="search" placeholder="ค้นหาชื่อเซิร์ฟเวอร์...">
+
+    <select id="category">
+      <option value="">ทุกหมวดหมู่</option>
+      <option>Anime</option>
+      <option>Gaming</option>
+      <option>Community</option>
+      <option>Education</option>
+      <option>Other</option>
+    </select>
+  </section>
+
+  <section class="server-section">
+    <div class="section-title">
+      <h2>เลือกเซิร์ฟเวอร์</h2>
+      <span id="count">กำลังโหลด...</span>
+    </div>
+
+    <div id="serverList" class="server-list"></div>
+
+    <div class="pagination">
+      <button id="previous">ก่อนหน้า</button>
+      <span id="pageInfo">หน้า 1</span>
+      <button id="next">ถัดไป</button>
+    </div>
+  </section>
+</main>
+
+<footer>NEON THAILAND COMMUNITY</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
