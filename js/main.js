@@ -1,168 +1,118 @@
 
-// =====================================
-// DISCORD HUB - MAIN JAVASCRIPT
-// =====================================
+document.addEventListener("DOMContentLoaded", () => {
+  const list = document.getElementById("serverList");
+  const search = document.getElementById("searchInput");
+  const category = document.getElementById("categoryFilter");
+  const sort = document.getElementById("sortSelect");
+  const pagination = document.getElementById("pagination");
+  const resultCount = document.getElementById("serverCount");
 
-// เชื่อมต่อ HTML ด้วย ID ที่ถูกต้อง
-const list = document.getElementById("serverList");
-const search = document.getElementById("searchInput");
-const category = document.getElementById("categoryFilter");
-const sort = document.getElementById("sortSelect");
-const pagination = document.getElementById("pagination");
-const resultCount = document.getElementById("serverCount");
+  let servers = [];
+  let currentPage = 1;
+  const perPage = 12;
 
-let servers = [];
-let currentPage = 1;
-
-const perPage = 12;
-
-
-// =====================================
-// โหลดข้อมูลเซิร์ฟเวอร์
-// =====================================
-
-async function loadServers() {
-  try {
-    const response = await fetch("./servers.json");
-
-    if (!response.ok) {
-      throw new Error("โหลด servers.json ไม่สำเร็จ");
-    }
-
-    const data = await response.json();
-
-    if (!Array.isArray(data)) {
-      throw new Error("รูปแบบข้อมูลไม่ถูกต้อง");
-    }
-
-    servers = data.map((server, index) => ({
-      ...server,
-      originalIndex: index
-    }));
-
-    loadCategories();
-    renderServers();
-
-  } catch (error) {
-    console.error(error);
-
-    list.textContent = "ไม่สามารถโหลดข้อมูลเซิร์ฟเวอร์ได้";
-    resultCount.textContent = "เกิดข้อผิดพลาด";
+  // ตรวจสอบ HTML
+  if (!list || !search || !category || !sort || !pagination || !resultCount) {
+    console.error("ไม่พบ HTML ID ที่จำเป็น");
+    return;
   }
-}
 
+  async function loadServers() {
+    try {
+      list.textContent = "กำลังโหลดข้อมูล...";
 
-// =====================================
-// โหลดหมวดหมู่อัตโนมัติ
-// =====================================
+      const response = await fetch(
+        new URL("servers.json", document.baseURI)
+      );
 
-function loadCategories() {
-  const categories = [
-    ...new Set(
-      servers
-        .map(server => server.category)
-        .filter(Boolean)
-    )
-  ];
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
 
-  category.replaceChildren();
+      const data = await response.json();
 
-  const allOption = document.createElement("option");
-  allOption.value = "";
-  allOption.textContent = "ทุกหมวดหมู่";
-  category.appendChild(allOption);
+      if (!Array.isArray(data)) {
+        throw new Error("ข้อมูล JSON ไม่ใช่ Array");
+      }
 
-  categories.sort((a, b) =>
-    String(a).localeCompare(String(b), "th")
-  );
+      servers = data.map((server, index) => ({
+        ...server,
+        originalIndex: index
+      }));
 
-  categories.forEach(item => {
-    const option = document.createElement("option");
-    option.value = item;
-    option.textContent = item;
-    category.appendChild(option);
-  });
-}
+      loadCategories();
+      renderServers();
 
+    } catch (error) {
+      console.error("โหลดข้อมูลผิดพลาด:", error);
+      list.textContent = "ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่";
+      resultCount.textContent = "เกิดข้อผิดพลาด";
+    }
+  }
 
-// =====================================
-// ค้นหา กรอง และเรียงลำดับ
-// =====================================
+  function loadCategories() {
+    category.replaceChildren();
 
-function getFilteredServers() {
-  let result = [...servers];
+    const all = document.createElement("option");
+    all.value = "";
+    all.textContent = "ทุกหมวดหมู่";
+    category.appendChild(all);
 
-  const keyword = search.value.trim().toLowerCase();
-  const selectedCategory = category.value;
-  const sortValue = sort.value;
+    const categories = [...new Set(
+      servers.map(s => s.category).filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b, "th"));
 
-  // ค้นหา
-  if (keyword) {
-    result = result.filter(server => {
-      const text = [
-        server.name,
-        server.description,
-        server.short_description,
-        server.category
-      ].join(" ").toLowerCase();
-
-      return text.includes(keyword);
+    categories.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item;
+      option.textContent = item;
+      category.appendChild(option);
     });
   }
 
-  // กรองหมวดหมู่
-  if (selectedCategory) {
-    result = result.filter(server =>
-      server.category === selectedCategory
-    );
+  function getFilteredServers() {
+    let result = [...servers];
+    const keyword = search.value.trim().toLowerCase();
+
+    if (keyword) {
+      result = result.filter(server =>
+        [
+          server.name,
+          server.description,
+          server.short_description,
+          server.category
+        ].join(" ").toLowerCase().includes(keyword)
+      );
+    }
+
+    if (category.value) {
+      result = result.filter(
+        server => server.category === category.value
+      );
+    }
+
+    if (sort.value === "name") {
+      result.sort((a, b) =>
+        String(a.name || "").localeCompare(String(b.name || ""), "th")
+      );
+    } else if (sort.value === "newest") {
+      result.sort((a, b) => a.originalIndex - b.originalIndex);
+    } else if (sort.value === "oldest") {
+      result.sort((a, b) => b.originalIndex - a.originalIndex);
+    }
+
+    return result;
   }
 
-  // เรียงตามชื่อ
-  if (sortValue === "name") {
-    result.sort((a, b) =>
-      String(a.name || "").localeCompare(
-        String(b.name || ""),
-        "th"
-      )
-    );
-  }
+  function createServerCard(server) {
+    const link = document.createElement("a");
+    link.className = "server-row";
+    link.href = `server.html?slug=${encodeURIComponent(server.slug || "")}`;
 
-  // เพิ่มล่าสุด
-  else if (sortValue === "newest") {
-    result.sort((a, b) =>
-      a.originalIndex - b.originalIndex
-    );
-  }
-
-  // เพิ่มเก่าสุด
-  else if (sortValue === "oldest") {
-    result.sort((a, b) =>
-      b.originalIndex - a.originalIndex
-    );
-  }
-
-  return result;
-}
-
-
-// =====================================
-// สร้างการ์ดเซิร์ฟเวอร์
-// =====================================
-
-function createServerCard(server) {
-  const link = document.createElement("a");
-
-  link.className = "server-row";
-  link.href =
-    `server.html?slug=${encodeURIComponent(server.slug || "")}`;
-
-  // โลโก้
-  if (server.logo) {
     const logo = document.createElement("img");
-
     logo.className = "server-logo";
-    logo.src = server.logo;
-    logo.alt = server.name || "Server logo";
+    logo.src = server.logo || "";
+    logo.alt = server.name || "Discord";
     logo.loading = "lazy";
 
     logo.onerror = () => {
@@ -172,176 +122,97 @@ function createServerCard(server) {
       logo.replaceWith(fallback);
     };
 
-    link.appendChild(logo);
+    const info = document.createElement("div");
+    info.className = "server-info";
 
-  } else {
-    const logo = document.createElement("div");
+    const name = document.createElement("h3");
+    name.textContent = server.name || "ไม่มีชื่อ";
 
-    logo.className = "server-logo";
-    logo.textContent = "Discord";
+    const description = document.createElement("p");
+    description.textContent = server.short_description || "ไม่มีคำอธิบาย";
 
-    link.appendChild(logo);
+    const tag = document.createElement("span");
+    tag.className = "category-tag";
+    tag.textContent = server.category || "ทั่วไป";
+
+    info.append(name, description, tag);
+
+    const arrow = document.createElement("span");
+    arrow.className = "server-arrow";
+    arrow.textContent = "›";
+
+    link.append(logo, info, arrow);
+    return link;
   }
 
-  // ข้อมูล
-  const info = document.createElement("div");
-  info.className = "server-info";
+  function renderPagination(totalPages) {
+    pagination.replaceChildren();
 
-  const name = document.createElement("h3");
-  name.textContent = server.name || "ไม่มีชื่อ";
+    if (totalPages <= 1) return;
 
-  const description = document.createElement("p");
-  description.textContent =
-    server.short_description || "ไม่มีคำอธิบาย";
+    function addButton(label, page) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.disabled = page === currentPage;
 
-  const tag = document.createElement("span");
-  tag.className = "category-tag";
-  tag.textContent = server.category || "ทั่วไป";
-
-  info.appendChild(name);
-  info.appendChild(description);
-  info.appendChild(tag);
-
-  // ลูกศร
-  const arrow = document.createElement("span");
-  arrow.className = "server-arrow";
-  arrow.textContent = "›";
-
-  link.appendChild(info);
-  link.appendChild(arrow);
-
-  return link;
-}
-
-
-// =====================================
-// แสดงเซิร์ฟเวอร์
-// =====================================
-
-function renderServers() {
-  const filtered = getFilteredServers();
-
-  const totalPages = Math.ceil(
-    filtered.length / perPage
-  );
-
-  if (currentPage > totalPages) {
-    currentPage = Math.max(1, totalPages);
-  }
-
-  const start = (currentPage - 1) * perPage;
-
-  const pageServers = filtered.slice(
-    start,
-    start + perPage
-  );
-
-  list.replaceChildren();
-
-  if (filtered.length === 0) {
-    const empty = document.createElement("p");
-
-    empty.textContent = "ไม่พบเซิร์ฟเวอร์ที่ค้นหา";
-
-    list.appendChild(empty);
-
-  } else {
-    pageServers.forEach(server => {
-      list.appendChild(
-        createServerCard(server)
-      );
-    });
-  }
-
-  resultCount.textContent =
-    `พบ ${filtered.length} เซิร์ฟเวอร์`;
-
-  renderPagination(totalPages);
-}
-
-
-// =====================================
-// ระบบแบ่งหน้า
-// =====================================
-
-function renderPagination(totalPages) {
-  pagination.replaceChildren();
-
-  if (totalPages <= 1) return;
-
-  function createButton(label, page, active = false) {
-    const button = document.createElement("button");
-
-    button.type = "button";
-    button.textContent = label;
-    button.className = active ? "active" : "";
-    button.disabled = page === currentPage;
-
-    button.addEventListener("click", () => {
-      currentPage = page;
-
-      renderServers();
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
+      button.addEventListener("click", () => {
+        currentPage = page;
+        renderServers();
+        window.scrollTo({ top: 0, behavior: "smooth" });
       });
-    });
 
-    return button;
+      pagination.appendChild(button);
+    }
+
+    addButton("ก่อนหน้า", Math.max(1, currentPage - 1));
+
+    for (let i = 1; i <= totalPages; i++) {
+      addButton(String(i), i);
+    }
+
+    addButton("ถัดไป", Math.min(totalPages, currentPage + 1));
   }
 
-  pagination.appendChild(
-    createButton(
-      "ก่อนหน้า",
-      Math.max(1, currentPage - 1)
-    )
-  );
+  function renderServers() {
+    const filtered = getFilteredServers();
+    const totalPages = Math.ceil(filtered.length / perPage);
 
-  for (let i = 1; i <= totalPages; i++) {
-    pagination.appendChild(
-      createButton(
-        String(i),
-        i,
-        i === currentPage
-      )
-    );
+    currentPage = Math.min(currentPage, Math.max(1, totalPages));
+
+    const start = (currentPage - 1) * perPage;
+    const pageServers = filtered.slice(start, start + perPage);
+
+    list.replaceChildren();
+
+    if (filtered.length === 0) {
+      const empty = document.createElement("p");
+      empty.textContent = "ไม่พบเซิร์ฟเวอร์ที่ค้นหา";
+      list.appendChild(empty);
+    } else {
+      pageServers.forEach(server =>
+        list.appendChild(createServerCard(server))
+      );
+    }
+
+    resultCount.textContent = `พบ ${filtered.length} เซิร์ฟเวอร์`;
+    renderPagination(totalPages);
   }
 
-  pagination.appendChild(
-    createButton(
-      "ถัดไป",
-      Math.min(totalPages, currentPage + 1)
-    )
-  );
-}
+  search.addEventListener("input", () => {
+    currentPage = 1;
+    renderServers();
+  });
 
+  category.addEventListener("change", () => {
+    currentPage = 1;
+    renderServers();
+  });
 
-// =====================================
-// เชื่อมต่อระบบต่าง ๆ
-// =====================================
+  sort.addEventListener("change", () => {
+    currentPage = 1;
+    renderServers();
+  });
 
-// ค้นหา
-search.addEventListener("input", () => {
-  currentPage = 1;
-  renderServers();
+  loadServers();
 });
-
-// หมวดหมู่
-category.addEventListener("change", () => {
-  currentPage = 1;
-  renderServers();
-});
-
-// เรียงลำดับ
-sort.addEventListener("change", () => {
-  currentPage = 1;
-  renderServers();
-});
-
-
-// =====================================
-// เริ่มต้น
-// =====================================
-
-loadServers();
