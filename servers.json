@@ -1,0 +1,22 @@
+[
+  {
+    "slug": "love-link-click",
+    "name": "รัก Link Click",
+    "category": "หาเพื่อน",
+    "short_description": "เข้ามาคุยเล่นกันได้น้าา",
+    "description": "ดิสนี้เอาไว้หาเพื่อน คุยเล่น เล่นเกมด้วยกัน และสร้างความสัมพันธ์ คนในดิสเป็นกันเอง ยินดีต้อนรับทุกคน",
+    "logo": "images/link-click-logo.png",
+    "banner": "images/link-click-banner.jpg",
+    "invite": "https://discord.gg/ใส่ลิงก์ของคุณ"
+  },
+  {
+    "slug": "example-server",
+    "name": "ตัวอย่างเซิร์ฟเวอร์",
+    "category": "เกม",
+    "short_description": "พื้นที่สำหรับคนชอบเล่นเกม",
+    "description": "เข้ามาพูดคุยและเล่นเกมด้วยกันได้",
+    "logo": "images/example-logo.png",
+    "banner": "images/example-banner.jpg",
+    "invite": "https://discord.gg/ใส่ลิงก์ของคุณ"
+  }
+]
