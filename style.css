@@ -397,4 +397,23 @@ footer {
   .detail-banner {
     aspect-ratio: 16 / 8;
   }
+  /* SERVER BANNER */
+
+.server-banner {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
 }
+
+/* SERVER LOGO */
+
+.server-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 12px;
+
+}
+
