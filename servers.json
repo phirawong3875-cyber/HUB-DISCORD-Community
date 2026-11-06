@@ -21,13 +21,13 @@
     "invite": "https://discord.gg/KWeRcNy5Um"
   },
   {
-    "slug": "example-server",
-    "name": "ตัวอย่างเซิร์ฟเวอร์",
-    "category": "เกม",
-    "short_description": "พื้นที่สำหรับคนชอบเล่นเกม",
+    "slug": "FAMILY-FOREVER",
+    "name": "FAMILY FOREVER",
+    "category": "หาเพื่อน",
+    "short_description": "พื้นที่สำหรับคหาครอบครัว",
     "description": "เข้ามาพูดคุยและเล่นเกมด้วยกันได้",
-    "logo": "images/example-logo.png",
-    "banner": "images/banners/example-server.jpg",
-    "invite": "https://discord.gg/ใส่ลิงก์ของคุณ"
+    "logo": "images/1793967397935.jpg",
+    "banner": "images/1792942337862.jpg",
+    "invite": "https://discord.gg/UNJkCzHaVs"
   }
 ]
