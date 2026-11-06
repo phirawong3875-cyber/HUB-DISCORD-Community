@@ -11,14 +11,14 @@
     "invite": "https://discord.gg/TPbnsby9P"
   },
   {
-    "slug": "example-server",
-    "name": "ตัวอย่างเซิร์ฟเวอร์",
-    "category": "เกม",
+    "slug": "Mournelle",
+    "name": "Mournelle",
+    "category": "เกม","หาเพื่อน",
     "short_description": "พื้นที่สำหรับคนชอบเล่นเกม",
     "description": "เข้ามาพูดคุยและเล่นเกมด้วยกันได้",
     "logo": "images/example-logo.png",
     "banner": "images/banners/example-server.jpg",
-    "invite": "https://discord.gg/ใส่ลิงก์ของคุณ"
+    "invite": "https://discord.gg/KWeRcNy5Um"
   },
   {
     "slug": "example-server",
