@@ -1,89 +1,74 @@
-// =====================================
+// ==========================================
 // DISCORD HUB - MAIN JAVASCRIPT
-// =====================================
+// ==========================================
 
 document.addEventListener("DOMContentLoaded", () => {
-
-  // =====================================
-  // HTML ELEMENTS
-  // =====================================
-
   const list = document.getElementById("serverList");
   const search = document.getElementById("searchInput");
   const category = document.getElementById("categoryFilter");
   const sort = document.getElementById("sortSelect");
   const pagination = document.getElementById("pagination");
-  const resultCount = document.getElementById("serverCount");
+  const serverCount = document.getElementById("serverCount");
 
   let servers = [];
   let currentPage = 1;
+
   const perPage = 12;
 
-  // =====================================
-  // CHECK HTML
-  // =====================================
-
-  if (!list || !search || !category || !sort || !pagination || !resultCount) {
-    console.error("ไม่พบ HTML ID ที่จำเป็น");
-    return;
-  }
-
-  // =====================================
-  // LOAD SERVERS.JSON
-  // =====================================
+  // ==========================================
+  // LOAD SERVER DATA
+  // ==========================================
 
   async function loadServers() {
     try {
-      list.textContent = "กำลังโหลดข้อมูล...";
-
       const response = await fetch(
         new URL("servers.json", document.baseURI)
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP Error: ${response.status}`);
+        throw new Error("โหลด servers.json ไม่สำเร็จ");
       }
 
       const data = await response.json();
 
       if (!Array.isArray(data)) {
-        throw new Error("servers.json ต้องเป็น Array");
+        throw new Error("รูปแบบข้อมูล JSON ไม่ถูกต้อง");
       }
 
-      servers = data.map((server, index) => ({
-        ...server,
-        originalIndex: index
-      }));
+      servers = data;
 
       loadCategories();
       renderServers();
 
     } catch (error) {
-      console.error("โหลดข้อมูลผิดพลาด:", error);
+      console.error(error);
 
-      list.textContent = "ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่";
-      resultCount.textContent = "เกิดข้อผิดพลาด";
+      list.innerHTML = `
+        <p class="loading">
+          ไม่สามารถโหลดข้อมูลเซิร์ฟเวอร์ได้
+        </p>
+      `;
+
+      serverCount.textContent = "โหลดข้อมูลไม่สำเร็จ";
     }
   }
 
-  // =====================================
+  // ==========================================
   // LOAD CATEGORIES
-  // =====================================
+  // ==========================================
 
   function loadCategories() {
-    category.replaceChildren();
-
-    const allOption = document.createElement("option");
-    allOption.value = "";
-    allOption.textContent = "ทุกหมวดหมู่";
-
-    category.appendChild(allOption);
-
     const categories = [
       ...new Set(
-        servers.map(server => server.category).filter(Boolean)
+        servers
+          .map(server => server.category)
+          .filter(Boolean)
       )
-    ].sort((a, b) => a.localeCompare(b, "th"));
+    ];
+
+    category.innerHTML = `
+      <option value="">ทุกหมวดหมู่</option>
+    `;
 
     categories.forEach(item => {
       const option = document.createElement("option");
@@ -95,103 +80,65 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // =====================================
-  // FILTER SERVERS
-  // =====================================
+  // ==========================================
+  // FILTER AND SORT
+  // ==========================================
 
   function getFilteredServers() {
     let result = [...servers];
 
-    const keyword = search.value.trim().toLowerCase();
+    const keyword = search.value
+      .trim()
+      .toLowerCase();
 
+    const selectedCategory = category.value;
+
+    // SEARCH
     if (keyword) {
       result = result.filter(server => {
-
-        const content = [
+        return [
           server.name,
           server.description,
           server.short_description,
           server.category
-        ].filter(Boolean).join(" ").toLowerCase();
-
-        return content.includes(keyword);
+        ]
+          .filter(Boolean)
+          .some(value =>
+            String(value).toLowerCase().includes(keyword)
+          );
       });
     }
 
-    if (category.value) {
+    // CATEGORY
+    if (selectedCategory) {
       result = result.filter(
-        server => server.category === category.value
+        server => server.category === selectedCategory
       );
     }
 
     // SORT
-
     if (sort.value === "name") {
-
       result.sort((a, b) =>
-        String(a.name || "").localeCompare(
-          String(b.name || ""), "th"
+        (a.name || "").localeCompare(
+          b.name || "",
+          "th"
         )
       );
+    }
 
-    } else if (sort.value === "newest") {
-
-      result.sort(
-        (a, b) => a.originalIndex - b.originalIndex
-      );
-
-    } else if (sort.value === "oldest") {
-
-      result.sort(
-        (a, b) => b.originalIndex - a.originalIndex
-      );
-
+    if (sort.value === "oldest") {
+      result.reverse();
     }
 
     return result;
   }
 
-  // =====================================
-  // CREATE IMAGE
-  // =====================================
-
-  function createImage(src, className, alt, fallbackText) {
-
-    if (!src) {
-      const fallback = document.createElement("div");
-
-      fallback.className = className;
-      fallback.textContent = fallbackText;
-
-      return fallback;
-    }
-
-    const img = document.createElement("img");
-
-    img.className = className;
-    img.src = src;
-    img.alt = alt;
-    img.loading = "lazy";
-
-    img.onerror = () => {
-
-      const fallback = document.createElement("div");
-
-      fallback.className = className;
-      fallback.textContent = fallbackText;
-
-      img.replaceWith(fallback);
-    };
-
-    return img;
-  }
-
-  // =====================================
+  // ==========================================
   // CREATE SERVER CARD
-  // =====================================
+  // ไม่มี BANNER ในหน้านี้
+  // ==========================================
 
   function createServerCard(server) {
-
     const link = document.createElement("a");
 
     link.className = "server-row";
@@ -199,26 +146,24 @@ document.addEventListener("DOMContentLoaded", () => {
     link.href =
       `server.html?slug=${encodeURIComponent(server.slug || "")}`;
 
-    // BANNER
+    // LOGO เท่านั้น
+    const logo = document.createElement("img");
 
-    const banner = createImage(
-      server.banner,
-      "server-banner",
-      `${server.name || "Discord"} Banner`,
-      "ไม่มีแบนเนอร์"
-    );
+    logo.className = "server-logo";
+    logo.src = server.logo || "";
+    logo.alt = server.name || "Discord";
+    logo.loading = "lazy";
 
-    // LOGO
+    logo.onerror = () => {
+      const fallback = document.createElement("div");
 
-    const logo = createImage(
-      server.logo,
-      "server-logo",
-      server.name || "Discord",
-      "Discord"
-    );
+      fallback.className = "server-logo server-logo-fallback";
+      fallback.textContent = "DISCORD";
 
-    // SERVER INFO
+      logo.replaceWith(fallback);
+    };
 
+    // SERVER INFORMATION
     const info = document.createElement("div");
 
     info.className = "server-info";
@@ -235,174 +180,154 @@ document.addEventListener("DOMContentLoaded", () => {
     const tag = document.createElement("span");
 
     tag.className = "category-tag";
-
     tag.textContent = server.category || "ทั่วไป";
 
     info.append(name, description, tag);
 
     // ARROW
-
     const arrow = document.createElement("span");
 
     arrow.className = "server-arrow";
     arrow.textContent = "›";
 
-    // APPEND ELEMENTS
-
-    link.append(banner, logo, info, arrow);
+    // ประกอบการ์ดโดยใช้เฉพาะ Logo
+    link.append(logo, info, arrow);
 
     return link;
   }
 
-  // =====================================
+  // ==========================================
   // PAGINATION
-  // =====================================
+  // ==========================================
 
   function renderPagination(totalPages) {
+    pagination.innerHTML = "";
 
-    pagination.replaceChildren();
+    if (totalPages <= 1) {
+      return;
+    }
 
-    if (totalPages <= 1) return;
-
-    function addButton(label, page) {
-
+    function createButton(label, page, disabled = false) {
       const button = document.createElement("button");
 
-      button.type = "button";
       button.textContent = label;
-      button.disabled = page === currentPage;
+      button.disabled = disabled;
+
+      if (page === currentPage) {
+        button.classList.add("active");
+      }
 
       button.addEventListener("click", () => {
-
         currentPage = page;
-
         renderServers();
 
         window.scrollTo({
           top: 0,
           behavior: "smooth"
         });
-
       });
 
       pagination.appendChild(button);
     }
 
-    addButton(
-      "ก่อนหน้า",
-      Math.max(1, currentPage - 1)
+    createButton(
+      "‹",
+      currentPage - 1,
+      currentPage === 1
     );
 
-    for (let i = 1; i <= totalPages; i++) {
-
-      addButton(String(i), i);
-
+    for (let page = 1; page <= totalPages; page++) {
+      createButton(
+        page,
+        page,
+        false
+      );
     }
 
-    addButton(
-      "ถัดไป",
-      Math.min(totalPages, currentPage + 1)
+    createButton(
+      "›",
+      currentPage + 1,
+      currentPage === totalPages
     );
   }
 
-  // =====================================
+  // ==========================================
   // RENDER SERVERS
-  // =====================================
+  // ==========================================
 
   function renderServers() {
-
     const filtered = getFilteredServers();
 
     const totalPages = Math.ceil(
       filtered.length / perPage
     );
 
-    currentPage = Math.min(
-      currentPage,
-      Math.max(1, totalPages)
-    );
+    if (currentPage > totalPages) {
+      currentPage = Math.max(1, totalPages);
+    }
 
     const start = (currentPage - 1) * perPage;
 
-    const pageServers = filtered.slice(
+    const currentServers = filtered.slice(
       start,
       start + perPage
     );
 
-    list.replaceChildren();
+    // CLEAR OLD CONTENT
+    list.innerHTML = "";
 
-    // NO RESULTS
-
-    if (filtered.length === 0) {
-
-      const empty = document.createElement("p");
-
-      empty.textContent = "ไม่พบเซิร์ฟเวอร์ที่ค้นหา";
-
-      list.appendChild(empty);
-
-    } else {
-
-      pageServers.forEach(server => {
-
-        list.appendChild(
-          createServerCard(server)
-        );
-
-      });
-
-    }
-
-    // RESULT COUNT
-
-    resultCount.textContent =
+    // UPDATE COUNT
+    serverCount.textContent =
       `พบ ${filtered.length} เซิร์ฟเวอร์`;
 
-    // PAGINATION
+    // EMPTY RESULT
+    if (filtered.length === 0) {
+      list.innerHTML = `
+        <p class="loading">
+          ไม่พบเซิร์ฟเวอร์ที่ค้นหา
+        </p>
+      `;
+
+      pagination.innerHTML = "";
+      return;
+    }
+
+    // CREATE CARDS
+    const fragment = document.createDocumentFragment();
+
+    currentServers.forEach(server => {
+      fragment.appendChild(
+        createServerCard(server)
+      );
+    });
+
+    list.appendChild(fragment);
 
     renderPagination(totalPages);
   }
 
-  // =====================================
-  // SEARCH EVENT
-  // =====================================
+  // ==========================================
+  // EVENTS
+  // ==========================================
 
   search.addEventListener("input", () => {
-
     currentPage = 1;
-
     renderServers();
-
   });
-
-  // =====================================
-  // CATEGORY EVENT
-  // =====================================
 
   category.addEventListener("change", () => {
-
     currentPage = 1;
-
     renderServers();
-
   });
-
-  // =====================================
-  // SORT EVENT
-  // =====================================
 
   sort.addEventListener("change", () => {
-
     currentPage = 1;
-
     renderServers();
-
   });
 
-  // =====================================
+  // ==========================================
   // START
-  // =====================================
+  // ==========================================
 
   loadServers();
-
 });
