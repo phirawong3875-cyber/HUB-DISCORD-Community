@@ -637,3 +637,34 @@ footer {
   }
 
 }
+/* =================================
+   FIX: HIDE BANNER ON SERVER LIST
+================================= */
+
+#serverList .server-row {
+  background-image: none !important;
+}
+
+#serverList .server-row img:not(.server-logo) {
+  display: none !important;
+}
+
+#serverList .server-row .detail-banner,
+#serverList .server-row .server-banner,
+#serverList .server-row .banner {
+  display: none !important;
+}
+
+#serverList .server-row::before,
+#serverList .server-row::after {
+  background-image: none !important;
+}
+
+/* แสดงเฉพาะ LOGO */
+#serverList .server-row .server-logo {
+  display: block !important;
+  width: 75px;
+  height: 75px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
