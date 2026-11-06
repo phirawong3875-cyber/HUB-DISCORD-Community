@@ -414,6 +414,107 @@ footer {
   height: 64px;
   object-fit: cover;
   border-radius: 12px;
+/* =====================================
+   DETAIL PAGE
+===================================== */
 
+.detail-container {
+  max-width: 900px;
+  margin: 30px auto;
+}
+
+/* BANNER */
+
+.detail-banner {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  display: block;
+  border-radius: 14px;
+  margin-bottom: 22px;
+}
+
+/* PROFILE */
+
+.detail-profile {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 25px;
+}
+
+.detail-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.detail-profile h1 {
+  color: var(--text);
+  margin: 0;
+}
+
+/* DESCRIPTION */
+
+.detail-description {
+  background: var(--panel);
+  padding: 22px;
+  border-radius: 14px;
+  margin-bottom: 22px;
+}
+
+.detail-description h2 {
+  color: var(--text);
+  margin-top: 0;
+}
+
+.detail-description p {
+  color: var(--muted);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* JOIN BUTTON */
+
+.join-button {
+  display: inline-block;
+  padding: 13px 25px;
+  background: #5865F2;
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.join-button:hover {
+  opacity: 0.85;
+}
+
+.join-button.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+  .detail-banner {
+    height: 180px;
+  }
+
+  .detail-logo {
+    width: 70px;
+    height: 70px;
+  }
+
+  .detail-profile h1 {
+    font-size: 22px;
+  }
+
+}
 }
 
